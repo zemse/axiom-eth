@@ -30,7 +30,7 @@ use super::circuit_types::{
 /// The lengths of the queries do not need to be a power of two, because we will
 /// pad it with "default" entries to optimize caching.
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum ResponseInput {
     Account(MultiAccountCircuit),
     Storage(MultiStorageCircuit),
@@ -47,7 +47,7 @@ impl ResponseInput {
     }
 }
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub struct ResponseTask {
     pub input: ResponseInput,
     pub schema: ExponentialSchema,
@@ -68,14 +68,16 @@ impl scheduler::Task for ResponseTask {
     /// This needs to be collision-resistant because we are using file system for caching right now.
     // Not the most efficient, but we're just going to serialize the whole task and keccak it
     fn name(&self) -> String {
-        let hash = match &self.input {
-            ResponseInput::Row(_) => {
-                // something about `Block` makes this hard to serialize with bincode
-                keccak256(serde_json::to_vec(&self).expect("failed to serialize task"))
-            }
-            _ => keccak256(bincode::serialize(&self).expect("failed to serialize task")),
-        };
-        format!("{:?}", H256(hash))
+        // TODO add support for serialization with PSE feature
+        unimplemented!()
+        // let hash = match &self.input {
+        //     ResponseInput::Row(_) => {
+        //         // something about `Block` makes this hard to serialize with bincode
+        //         keccak256(serde_json::to_vec(&self).expect("failed to serialize task"))
+        //     }
+        //     _ => keccak256(bincode::serialize(&self).expect("failed to serialize task")),
+        // };
+        // format!("{:?}", H256(hash))
     }
 
     fn dependencies(&self) -> Vec<Self> {
@@ -222,7 +224,7 @@ pub struct FinalAssemblyTask {
 }
 
 #[allow(clippy::large_enum_variant)]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug)]
 pub enum Task {
     Response(ResponseTask),
     BlockVerifyVsMmr(BlockVerifyVsMmrTask),
