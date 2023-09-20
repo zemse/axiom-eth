@@ -533,7 +533,7 @@ impl<'chip, F: Field> EthStorageChip<F> for EthChip<'chip, F> {
     }
 }
 
-#[derive(Clone, Debug, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Hash, Serialize, Deserialize)]
 pub struct EthStorageInput {
     pub addr: Address,
     pub acct_pf: MPTFixedKeyInput,
@@ -542,7 +542,7 @@ pub struct EthStorageInput {
     pub storage_pfs: Vec<(H256, U256, MPTFixedKeyInput)>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct EthBlockStorageInput {
     pub block: Block<H256>,
     pub block_number: u32,

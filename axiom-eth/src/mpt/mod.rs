@@ -209,7 +209,7 @@ impl<F: Field> ContainsParallelizableKeccakQueries for MPTFixedKeyProofWitness<F
     }
 }
 
-#[derive(Clone, Debug, Hash, Serialize, Deserialize)]
+#[derive(Clone, Debug, Default, Hash, Serialize, Deserialize)]
 /// The pre-assigned inputs for the MPT fixed key proof
 pub struct MPTFixedKeyInput {
     // claim specification: (path, value)
