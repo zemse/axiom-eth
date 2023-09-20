@@ -30,7 +30,7 @@ use halo2_base::{
 };
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
+use std::{cell::RefCell, marker::PhantomData};
 
 pub mod helpers;
 #[cfg(all(test, feature = "providers"))]
@@ -728,6 +728,73 @@ impl EthPreCircuit for EthBlockStorageCircuit {
             move |builder: &mut RlcThreadBuilder<Fr>,
                   rlp: RlpChip<Fr>,
                   keccak_rlcs: (FixedLenRLCs<Fr>, VarLenRLCs<Fr>)| {
+                // ======== SECOND PHASE ===========
+                let chip = EthChip::new(rlp, Some(keccak_rlcs));
+                let _trace = chip.parse_eip1186_proofs_from_block_phase1(builder, witness);
+            },
+        )
+    }
+}
+
+pub struct EthBlockStorageCircuitGeneric<F: Field>(EthBlockStorageCircuit, PhantomData<F>);
+
+impl<F: Field> EthBlockStorageCircuitGeneric<F> {
+    pub fn new(inputs: EthBlockStorageInput, network: Network) -> Self {
+        EthBlockStorageCircuitGeneric(EthBlockStorageCircuit { inputs, network }, PhantomData)
+    }
+
+    pub fn create(
+        self,
+        mut builder: RlcThreadBuilder<F>,
+        break_points: Option<RlcThreadBreakPoints>,
+    ) -> EthCircuitBuilder<F, impl FnSynthesize<F>> {
+        let range = RangeChip::default(ETH_LOOKUP_BITS);
+        let chip = EthChip::new(RlpChip::new(&range, None), None);
+        let mut keccak = KeccakChip::default();
+        // ================= FIRST PHASE ================
+        let ctx = builder.gate_builder.main(FIRST_PHASE);
+        let input = self.0.inputs.assign(ctx);
+        let (witness, digest) = chip.parse_eip1186_proofs_from_block_phase0(
+            &mut builder.gate_builder,
+            &mut keccak,
+            input,
+            self.0.network,
+        );
+        let EIP1186ResponseDigest {
+            block_hash,
+            block_number,
+            address,
+            slots_values,
+            address_is_empty,
+            slot_is_empty,
+        } = digest;
+        let assigned_instances = block_hash
+            .into_iter()
+            .chain([block_number, address])
+            .chain(
+                slots_values
+                    .into_iter()
+                    .flat_map(|(slot, value)| slot.into_iter().chain(value.into_iter())),
+            )
+            .collect_vec();
+        // For now this circuit is going to constrain that all slots are occupied. We can also create a circuit that exposes the bitmap of slot_is_empty
+        {
+            let ctx = builder.gate_builder.main(FIRST_PHASE);
+            range.gate.assert_is_const(ctx, &address_is_empty, &F::zero());
+            for slot_is_empty in slot_is_empty {
+                range.gate.assert_is_const(ctx, &slot_is_empty, &F::zero());
+            }
+        }
+
+        EthCircuitBuilder::new(
+            assigned_instances,
+            builder,
+            RefCell::new(keccak),
+            range,
+            break_points,
+            move |builder: &mut RlcThreadBuilder<F>,
+                  rlp: RlpChip<F>,
+                  keccak_rlcs: (FixedLenRLCs<F>, VarLenRLCs<F>)| {
                 // ======== SECOND PHASE ===========
                 let chip = EthChip::new(rlp, Some(keccak_rlcs));
                 let _trace = chip.parse_eip1186_proofs_from_block_phase1(builder, witness);
