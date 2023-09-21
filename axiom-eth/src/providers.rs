@@ -219,6 +219,37 @@ pub fn get_block_storage_input<P: JsonRpcClient>(
     EthBlockStorageInput { block, block_number, block_hash, block_header, storage }
 }
 
+pub async fn get_block_storage_input_async<P: JsonRpcClient>(
+    provider: &Provider<P>,
+    block_number: u32,
+    addr: Address,
+    slots: Vec<H256>,
+    acct_pf_max_depth: usize,
+    storage_pf_max_depth: usize,
+) -> EthBlockStorageInput {
+    // let rt = Runtime::new().unwrap();
+    let block = provider
+        .get_block(block_number as u64)
+        .await
+        .unwrap()
+        .unwrap_or_else(|| panic!("Block {block_number} not found"));
+    let block_hash = block.hash.unwrap();
+    let block_header = get_block_rlp(&block);
+
+    let mut storage = get_storage_query(
+        provider,
+        block_number as u64,
+        addr,
+        slots,
+        acct_pf_max_depth,
+        storage_pf_max_depth,
+    )
+    .await;
+    storage.acct_pf.root_hash = block.state_root;
+
+    EthBlockStorageInput { block, block_number, block_hash, block_header, storage }
+}
+
 pub fn is_assigned_slot(key: &H256, proof: &[Bytes]) -> bool {
     let mut key_nibbles = Vec::new();
     for &byte in key.as_bytes() {
