@@ -4,6 +4,7 @@
 #![feature(return_position_impl_trait_in_trait)]
 #![allow(incomplete_features)]
 #![warn(clippy::useless_conversion)]
+#![feature(type_alias_impl_trait)]
 
 use std::env::{set_var, var};
 
@@ -52,9 +53,10 @@ pub mod providers;
 
 pub const ETH_LOOKUP_BITS: usize = 8; // always want 8 to range check bytes
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Default)]
 #[cfg_attr(feature = "clap", derive(clap::ValueEnum))]
 pub enum Network {
+    #[default]
     Mainnet,
     Goerli,
 }
@@ -100,7 +102,7 @@ impl<F: Field> MPTConfig<F> {
 #[derive(Clone, Debug)]
 /// Config shared for block header and storage proof circuits
 pub struct EthConfig<F: Field> {
-    mpt: MPTConfig<F>,
+    pub mpt: MPTConfig<F>,
     pub instance: Column<Instance>,
 }
 

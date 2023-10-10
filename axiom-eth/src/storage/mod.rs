@@ -627,7 +627,7 @@ pub struct EthBlockStorageInputAssigned<F: Field> {
     pub storage: EthStorageInputAssigned<F>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct EthBlockStorageCircuit {
     pub inputs: EthBlockStorageInput, // public and private inputs
     pub network: Network,
@@ -736,6 +736,7 @@ impl EthPreCircuit for EthBlockStorageCircuit {
     }
 }
 
+#[derive(Clone, Debug, Default)]
 pub struct EthBlockStorageCircuitGeneric<F: Field>(EthBlockStorageCircuit, PhantomData<F>);
 
 impl<F: Field> EthBlockStorageCircuitGeneric<F> {
