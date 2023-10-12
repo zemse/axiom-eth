@@ -148,6 +148,7 @@ impl<F: ScalarField> RlcThreadBuilder<F> {
             unusable_rows: minimum_rows.unwrap_or(0),
             keccak_rows_per_round: 0,
             lookup_bits: var("LOOKUP_BITS").map(|s| s.parse().ok()).unwrap_or(None),
+            skip_instance: false,
         };
         #[cfg(feature = "display")]
         {
@@ -583,6 +584,7 @@ mod circuit_builder {
                 unusable_rows: _,
                 keccak_rows_per_round: _,
                 lookup_bits: _,
+                skip_instance: _,
             } = serde_json::from_str(&std::env::var("ETH_CONFIG_PARAMS").unwrap()).unwrap();
             let mut gate = FlexGateConfig::configure(
                 meta,
@@ -650,6 +652,7 @@ mod circuit_builder {
                 unusable_rows: _,
                 keccak_rows_per_round: _,
                 lookup_bits: _,
+                skip_instance: _,
             } = serde_json::from_str(&std::env::var("ETH_CONFIG_PARAMS").unwrap()).unwrap();
             let lookup_bits = std::env::var("LOOKUP_BITS").unwrap().parse().unwrap();
             RlpConfig::configure(

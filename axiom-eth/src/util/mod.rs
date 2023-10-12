@@ -48,6 +48,8 @@ pub struct EthConfigParams {
     pub keccak_rows_per_round: usize,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lookup_bits: Option<usize>,
+    // whether to skip the instance column
+    pub skip_instance: bool,
 }
 
 impl EthConfigParams {

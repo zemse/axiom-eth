@@ -103,14 +103,18 @@ impl<F: Field> MPTConfig<F> {
 /// Config shared for block header and storage proof circuits
 pub struct EthConfig<F: Field> {
     pub mpt: MPTConfig<F>,
-    pub instance: Column<Instance>,
+    pub instance: Option<Column<Instance>>,
 }
 
 impl<F: Field> EthConfig<F> {
     pub fn configure(meta: &mut ConstraintSystem<F>, params: impl Into<EthConfigParams>) -> Self {
-        let mpt = MPTConfig::configure(meta, params.into());
-        let instance = meta.instance_column();
-        meta.enable_equality(instance);
+        let params = params.into();
+        let mpt = MPTConfig::configure(meta, params.clone());
+        let mut instance: Option<Column<Instance>> = None;
+        if !params.skip_instance {
+            instance = Some(meta.instance_column());
+            meta.enable_equality(instance.unwrap());
+        }
         Self { mpt, instance }
     }
 
@@ -212,7 +216,9 @@ impl<F: Field, FnPhase1: FnSynthesize<F>> Circuit<F> for EthCircuitBuilder<F, Fn
                 let (cell, _) = assigned_advices
                     .get(&(cell.context_id, cell.offset))
                     .expect("instance not assigned");
-                layouter.constrain_instance(*cell, config.instance, i)?;
+                if let Some(instance) = config.instance {
+                    layouter.constrain_instance(*cell, instance, i)?;
+                }
             }
         }
         Ok(())
