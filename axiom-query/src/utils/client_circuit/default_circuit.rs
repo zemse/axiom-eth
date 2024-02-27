@@ -8,7 +8,7 @@ use axiom_eth::{
     halo2_proofs::{
         circuit::{Layouter, SimpleFloorPlanner},
         halo2curves::bn256::{Bn256, Fr, G1Affine},
-        plonk::{keygen_vk_custom, Circuit, ConstraintSystem, Error, VerifyingKey},
+        plonk::{keygen_vk, Circuit, ConstraintSystem, Error, VerifyingKey},
         poly::kzg::commitment::ParamsKZG,
     },
     rlc::circuit::{RlcCircuitParams, RlcConfig},
@@ -104,6 +104,6 @@ pub(crate) fn dummy_vk_from_metadata(
     metadata: AxiomV2CircuitMetadata,
 ) -> anyhow::Result<VerifyingKey<G1Affine>> {
     let dummy_circuit = DummyAxiomCircuit::<Fr> { metadata, _marker: PhantomData };
-    let vk = keygen_vk_custom(params, &dummy_circuit, false)?;
+    let vk = keygen_vk(params, &dummy_circuit)?;
     Ok(vk)
 }

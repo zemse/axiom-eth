@@ -29,13 +29,20 @@ type-map = "0.5.0"
 
 # halo2
 # halo2-base = { version = "=0.4.1", default-features = false, features = ["test-utils"] }
-halo2-base = { git = "https://github.com/axiom-crypto/halo2-lib.git", tag = "v0.4.1-git", default-features = false, features = ["test-utils"] }
+# halo2-base = { git = "https://github.com/axiom-crypto/halo2-lib.git", tag = "v0.4.1-git", default-features = false, features = ["test-utils"] }
+# halo2-base = { path = "../../halo2-lib/halo2-base", default-features = false }
+halo2-base = { git = "https://github.com/zemse/axiom-halo2-lib.git", branch = "scroll-static-call", default-features = false, features = ["test-utils"] }
+# halo2-base = { path = "../../scroll-halo2-lib/halo2-base", default-features = false }
+
 # zkevm-hashes = { version = "=0.2.1", default-features = false }
-zkevm-hashes = { git = "https://github.com/axiom-crypto/halo2-lib.git", tag = "v0.4.1-git", default-features = false }
+# zkevm-hashes = { git = "https://github.com/axiom-crypto/halo2-lib.git", tag = "v0.4.1-git", default-features = false }
+zkevm-hashes = { git = "https://github.com/zemse/axiom-halo2-lib.git", branch = "scroll-static-call", default-features = false }
+# zkevm-hashes = { path = "../../halo2-lib/hashes/zkevm", default-features = false }
+# zkevm-hashes = { path = "../../scroll-halo2-lib/hashes/zkevm-keccak", default-features = false, package = "zkevm-keccak" }
 
 # crypto
 rlp = "=0.5.2"
-ethers-core = { version = "=2.0.10" }
+ethers-core = { version = "=2.0.7" }
 # mpt implementation
 hasher = { version = "=0.1", features = ["hash-keccak"] }
 cita_trie = "=5.0.0"
@@ -48,12 +55,16 @@ rand_chacha = "0.3.1"
 
 # aggregation
 # snark-verifier = { version = "=0.1.7", default-features = false }
-snark-verifier = { git = "https://github.com/axiom-crypto/snark-verifier.git", tag = "v0.1.7-git", default-features = false }
+# snark-verifier = { git = "https://github.com/axiom-crypto/snark-verifier.git", tag = "v0.1.7-git", default-features = false }
 # snark-verifier-sdk = { version = "=0.1.7", default-features = false }
-snark-verifier-sdk = { git = "https://github.com/axiom-crypto/snark-verifier.git", tag = "v0.1.7-git", default-features = false }
+# snark-verifier-sdk = { git = "https://github.com/axiom-crypto/snark-verifier.git", tag = "v0.1.7-git", default-features = false }
+snark-verifier = { git = "https://github.com/zemse/snark-verifier.git", branch = "scroll-static-call", default-features = false }
+snark-verifier-sdk = { git = "https://github.com/zemse/snark-verifier.git", branch = "scroll-static-call", default-features = false }
+# snark-verifier = { path = "../../axiom-snark-verifier/snark-verifier", default-features = false }
+# snark-verifier-sdk = { path = "../../axiom-snark-verifier/snark-verifier-sdk", default-features = false }
 
 # generating circuit inputs from blockchain
-ethers-providers = { version = "=2.0.10", optional = true }
+ethers-providers = { version = "=2.0.7", optional = true }
 tokio = { version = "1.28", default-features = false, features = ["rt", "rt-multi-thread", "macros"], optional = true }
 futures = { version = "0.3", optional = true }
 
@@ -75,7 +86,7 @@ hasher = { version = "0.1", features = ["hash-keccak"] }
 
 [features]
 default = [
-    "halo2-axiom",
+    "halo2-pse",
     "jemallocator",
     "providers",
     "display",
@@ -93,5 +104,6 @@ halo2-pse = ["zkevm-hashes/halo2-pse", "snark-verifier-sdk/halo2-pse"]
 halo2-axiom = ["zkevm-hashes/halo2-axiom", "snark-verifier-sdk/halo2-axiom"]
 keygen = ["aggregation", "dep:blake3"]
 jemallocator = ["halo2-base/jemallocator"]
-asm = ["halo2-base/asm"]
+# asm = ["halo2-base/asm"]
+asm = []
 profile = ["halo2-base/profile"]

@@ -32,7 +32,7 @@ hex = "0.4.3"
 axiom-eth = { version = "=0.4.0", path = "../axiom-eth", default-features = false, features = ["providers", "aggregation", "evm"] }
 
 # crypto
-ethers-core = { version = "=2.0.10" }
+ethers-core = { version = "=2.0.7" }
 
 # keygen
 clap = { version = "=4.4.7", features = ["derive"], optional = true }
@@ -50,7 +50,7 @@ rand_chacha = "0.3.1"
 axiom-eth = { path = "../axiom-eth", features = ["revm"] }
 
 [features]
-default = ["halo2-axiom", "jemallocator", "keygen", "display"]
+default = ["halo2-pse", "jemallocator", "keygen", "display"]
 display = ["axiom-eth/display"]
 asm = ["axiom-eth/asm"]
 revm = ["axiom-eth/revm"]

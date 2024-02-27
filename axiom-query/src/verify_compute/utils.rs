@@ -28,7 +28,7 @@ use axiom_eth::{
         },
         utils::ScalarField,
     },
-    halo2curves::{bn256::G1Affine, ff::Field as _},
+    halo2curves::{bn256::G1Affine, ff::Field as _, pairing},
     rlc::circuit::RlcCircuitParams,
     snark_verifier::{
         pcs::kzg::KzgDecidingKey,
@@ -156,7 +156,10 @@ where
 pub fn get_onchain_vk_from_vk<C: CurveAffine>(
     vk: &VerifyingKey<C>,
     circuit_metadata: AxiomV2CircuitMetadata,
-) -> OnchainVerifyingKey<C> {
+) -> OnchainVerifyingKey<C>
+where
+    C::ScalarExt: pairing::group::ff::FromUniformBytes<64>,
+{
     let preprocessed = vk
         .fixed_commitments()
         .iter()
